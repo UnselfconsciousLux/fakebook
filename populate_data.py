@@ -5,6 +5,11 @@ import numpy as np
 import requests
 from lxml import html
 from bs4 import BeautifulSoup
+from textblob import TextBlob
+import nltk
+
+nltk.download('punkt')
+
 
 def getlikescount(post, graph):
     count = 0
@@ -52,10 +57,24 @@ for row in df.itertuples():
     # print(soup)
 
     # get the counts of likes and shares from api
-    post = graph.get_object(id=post_id, fields='link,caption,description')
+    post = graph.get_object(id=post_id, fields='link,caption,description,comments')
+    all_comments = ''
+    for comment in post['comments']['data']:
+        all_comments += comment['message']
+    blob = TextBlob(all_comments)
+
+    polarity_sum = 0
+    count = 0
+    for sentence in blob.sentences:
+        # print(sentence)
+        polarity_sum += sentence.sentiment.polarity
+        count += 1
+        # print(sentence.sentiment.polarity)
+
+    avg_polarity = polarity_sum / count
+    print(avg_polarity)
     # likes = post['likes']['summary']['total_count']
     # shares = post['shares']['summary']['total_count']
     # print(post_id, " ", post['reactions']['summary']['total_count'])
     # print(post_id, " ", post['reactions']['summary']['viewer_reaction'])
-    print(post)
 # print(graph.get_object(id=post_id))
