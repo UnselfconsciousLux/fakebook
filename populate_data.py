@@ -23,6 +23,7 @@ for row in df.itertuples():
     if not math.isnan(row.share_count):
 
         post_id = str(row.account_id) + "_" + str(row.post_id)
+        print('adding object {id} to data frame'.format(id=post_id))
         if row.Rating == "no factual content":
             result_df.loc[result_pointer, 'Rating'] = 0
         elif row.Rating == "mostly false":
@@ -66,6 +67,8 @@ for row in df.itertuples():
         else:
             result_df.loc[result_pointer, 'ShareToReaction'] = row.share_count
         result_pointer += 1
+        print('added object {id} to data frame'.format(id=post_id))
+print('DateFrame:')
 print(result_df)
 
 print(result_df.isnull().sum())
