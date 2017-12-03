@@ -4,7 +4,7 @@ import math
 import pandas as pd
 import numpy as np
 import requests
-from lxml import html
+# from lxml import html
 from textblob import TextBlob
 import nltk
 from sklearn import linear_model
@@ -27,6 +27,8 @@ for row in df.itertuples():
         elif row.Rating == "mostly false":
             result_df.loc[result_pointer, 'Rating'] = 0
         elif row.Rating == "mostly true":
+            result_df.loc[result_pointer, 'Rating'] = 1
+        elif row.Rating == "mixture of true and false":
             result_df.loc[result_pointer, 'Rating'] = 1
         if row.Category == "left":
             result_df.loc[result_pointer, 'Category'] = 0
@@ -51,23 +53,28 @@ for row in df.itertuples():
         for sentence in blob.sentences:
             polarity_sum += sentence.sentiment.polarity
             count += 1
-        avg_polarity = polarity_sum / row.comment_count
-        result_df.loc[result_pointer, 'avg_polarity'] = avg_polarity
-        result_df.loc[result_pointer, 'shareToComments'] = row.share_count / row.comment_count
-        result_df.loc[result_pointer, 'ShareToReaction'] = row.share_count / row.reaction_count
+        if row.comment_count > 0:
+            result_df.loc[result_pointer, 'avg_polarity'] = polarity_sum / row.comment_count
+            result_df.loc[result_pointer, 'shareToComments'] = row.share_count / row.comment_count
+        else:
+            result_df.loc[result_pointer, 'avg_polarity'] = polarity_sum
+            result_df.loc[result_pointer, 'shareToComments'] = row.share_count
 
+        if row.reaction_count > 0:
+            result_df.loc[result_pointer, 'ShareToReaction'] = row.share_count / row.reaction_count
+        else:
+            result_df.loc[result_pointer, 'ShareToReaction'] = row.share_count
         result_pointer += 1
 print(result_df)
+
+print(result_df.isnull().sum())
 
 
 # Making the logistic Regression Model
 logreg = linear_model.LogisticRegression(C=1e5)
-X_train, X_test, y_train, y_test = train_test_split(result_df["Category":"ShareToReaction"],result_df["Rating"], test_size=0.2, random_state=42)
-logreg.fit(X_train,y_train)
+X_train, X_test, y_train, y_test = train_test_split(result_df.loc[:, "Category":"ShareToReaction"], result_df["Rating"], test_size=0.2, random_state=42)
+logreg.fit(X_train, y_train)
 y_pred = logreg.predict(X_test)
 print(y_pred)
-score = logreg.score(X_test,y_test)
-print(score)
-
-
-
+score = logreg.score(X_test, y_test)
+print(score * 100)
