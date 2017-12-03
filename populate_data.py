@@ -9,6 +9,7 @@ from textblob import TextBlob
 import nltk
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
+import pickle
 
 nltk.download('punkt')
 token = 'EAAcEzS4nGr8BANeiWSHCQ9IrsfrtliD5mr0SLUkZCZBThD4s7UtnUrn2s31jxlbK9eh3uQGHQ6OtYRHYgw4lHZBPgAUMAvrmtOukMJPVJZA3QyajFD3dc5WIYB2tapgFrTiJrhcgKZAlkvoZCoJPLrOTunMhBg4s0ZD'
@@ -74,6 +75,8 @@ print(result_df.isnull().sum())
 logreg = linear_model.LogisticRegression(C=1e5)
 X_train, X_test, y_train, y_test = train_test_split(result_df.loc[:, "Category":"ShareToReaction"], result_df["Rating"], test_size=0.2, random_state=42)
 logreg.fit(X_train, y_train)
+filename = 'finalized_model.sav'
+pickle.dump(logreg, open(filename, 'wb'))
 y_pred = logreg.predict(X_test)
 print(y_pred)
 score = logreg.score(X_test, y_test)
