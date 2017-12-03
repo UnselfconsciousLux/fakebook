@@ -23,50 +23,115 @@
   <h2 class="text-center">Facebook Posts</h2>
   <div class="panel-group">
 
-    <div class="panel panel-success">
+   <!-- <div class="panel panel-success">
+      <div class="panel-heading">not suspicsious news</div>
+      <div class="panel-body"><h1>Donald Trump has no comprehension of the meaning of the word ""truth."""</h1></div>
+    </div>
+
+   <div class="panel panel-success">
+      <div class="panel-heading">not suspicsious news</div>
+      <div class="panel-body"><h1>Fox News host Sean Hannity desperately tried to smear Terence Crutcher on Wednesday as a violent criminal who was wanted by police but was repeatedly shut down by a local anchor.</h1></div>
+    </div>
+
+
+
+   <div class="panel panel-danger">
+      <div class="panel-heading">suspicsious news </div>
+      <div class="panel-body"><h1>Because to Donald, size really is all that matters</h1></div>
+    </div>
+
+   <div class="panel panel-danger">
       <div class="panel-heading">Panel with panel-success class</div>
-      <div class="panel-body">Panel Content</div>
+      <div class="panel-body"><h1>This Racist ShitStick Congressman is up for Reelection In Nove...</h1></div>
     </div>
 
-    <div class="panel panel-success">
-      <div class="panel-heading">Panel with panel-success class</div>
-      <div class="panel-body">Panel Content</div>
-    </div>
-
-
-    <div class="panel panel-success">
-      <div class="panel-heading">Panel with panel-success class</div>
-      <div class="panel-body">Panel Content</div>
-    </div>
-
-    <div class="panel panel-danger">
-      <div class="panel-heading">Panel with panel-danger class</div>
-      <div class="panel-body">Panel Content</div>
-    </div>
-
-    <div class="panel panel-success">
-      <div class="panel-heading">Panel with panel-success class</div>
-      <div class="panel-body">Panel Content</div>
-    </div>
-
-    <div class="panel panel-danger">
-      <div class="panel-heading">Panel with panel-danger class</div>
-      <div class="panel-body">Panel Content</div>
-    </div>
-
+   <div class="panel panel-danger">
+      <div class="panel-heading">suspicsious news</div>
+      <div class="panel-body"><h1>Keep sharing these! Show everyone that BLM is a racist terrorist organization!</h1></div> -->
+    <!-- </div> -->
   </div>
+
 </div>
 <script>
 $("button").click(function(){
     console.log("in here")
-    $.post("http://localhost:5000/predict",
-    {
-        myurl: $("#checkPost").html(),
-    },
-    function(s){
-        console.log(s)
-    });
+        $.ajax({
+          type: "POST",
+          contentType: "application/json",
+          url: 'http://localhost:5000/predict',
+          data: JSON.stringify({ "myurl" : $('#checkPost')[0].value}),
+          dataType: "json"
+        });
 });
+
+$.ajax({
+  type: "GET",
+  url: 'http://localhost:5000/index',
+  dataType: 'text',
+}).done(successFunction);
+
+function successFunction(data) {
+  // console.log(data)
+  var allRows = data.split(/\r?\n|\r/);
+  var panel_group = $('.panel-group').get(0)
+
+  for (var singleRow = 0; singleRow < allRows.length; singleRow++) {
+    var rowCells = allRows[singleRow].split(',');
+    var child = ''
+    if (rowCells[1] == 1){
+      child += '<div class="panel panel-danger">';
+      child += '<div class="panel-heading">Panel with panel-success class</div>';
+    }
+    else {
+      child += '<div class="panel panel-success">' ;
+      child += '<div class="panel-heading">not suspicsious news</div>';
+    }
+    child += '<div class="panel-body">';
+    child += '<h1>';
+    child += rowCells[0];
+    child += '</h1>';
+    child += '</div>';
+    child += '</div>';
+    var parser = new DOMParser();
+    child_dom = parser.parseFromString(child, "text/xml");
+    child_dom = child_dom.children[0];
+    panel_group.appendChild(child_dom);
+  }
+  
+  // for (var singleRow = 0; singleRow < allRows.length; singleRow++) {
+  //   if (singleRow === 0) {
+  //     table += '<thead>';
+  //     table += '<tr>';
+  //   } else {
+  //     table += '<tr>';
+  //   }
+  //   var rowCells = allRows[singleRow].split(',');
+  //   console.log(rowCells)
+  //   for (var rowCell = 0; rowCell < rowCells.length; rowCell++) {
+  //     if (singleRow === 0) {
+  //       table += '<th>';
+  //       table += rowCells[rowCell];
+  //       table += '</th>';
+  //     } else {
+  //       table += '<td>';
+  //       table += rowCells[rowCell];
+  //       table += '</td>';
+  //     }
+  //   }
+  //   if (singleRow === 0) {
+  //     table += '</tr>';
+  //     table += '</thead>';
+  //     table += '<tbody>';
+  //   } else {
+  //     table += '</tr>';
+  //   }
+  // } 
+  // table += '</tbody>';
+  // table += '</table>';
+  // $('body').append(table);
+}
+
+
 </script>
 <style>
 
