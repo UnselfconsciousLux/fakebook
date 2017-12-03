@@ -7,6 +7,8 @@ import requests
 from lxml import html
 from textblob import TextBlob
 import nltk
+from sklearn import linear_model
+from sklearn.model_selection import train_test_split
 
 nltk.download('punkt')
 token = 'EAAcEzS4nGr8BANeiWSHCQ9IrsfrtliD5mr0SLUkZCZBThD4s7UtnUrn2s31jxlbK9eh3uQGHQ6OtYRHYgw4lHZBPgAUMAvrmtOukMJPVJZA3QyajFD3dc5WIYB2tapgFrTiJrhcgKZAlkvoZCoJPLrOTunMhBg4s0ZD'
@@ -19,7 +21,6 @@ result_pointer = 0
 for row in df.itertuples():
     if not math.isnan(row.share_count):
 
-        print(result_pointer)
         post_id = str(row.account_id) + "_" + str(row.post_id)
         if row.Rating == "no factual content":
             result_df.loc[result_pointer, 'Rating'] = 0
@@ -56,4 +57,17 @@ for row in df.itertuples():
         result_df.loc[result_pointer, 'ShareToReaction'] = row.share_count / row.reaction_count
 
         result_pointer += 1
-print(result_df["Rating"], result_df["Category"], result_df["avg_polarity"], result_df["ShareToReaction"], result_df["shareToComments"])
+print(result_df)
+
+
+# Making the logistic Regression Model
+logreg = linear_model.LogisticRegression(C=1e5)
+X_train, X_test, y_train, y_test = train_test_split(result_df["Category":"ShareToReaction"],result_df["Rating"], test_size=0.2, random_state=42)
+logreg.fit(X_train,y_train)
+y_pred = logreg.predict(X_test)
+print(y_pred)
+score = logreg.score(X_test,y_test)
+print(score)
+
+
+
