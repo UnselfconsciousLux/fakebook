@@ -55,14 +55,28 @@
 <script>
 $("button").click(function(){
     console.log("in here")
+    url = $('#checkPost')[0].value
+    console.log(url)
         $.ajax({
           type: "POST",
           contentType: "application/json",
           url: 'http://localhost:5000/predict',
-          data: JSON.stringify({ "myurl" : $('#checkPost')[0].value}),
-          dataType: "json"
-        });
+          data: JSON.stringify({ "myurl" : url}),
+          dataType: "json",
+          success: function(data){
+            alert(here);
+          }
+        }).done(alert_suspicion);
 });
+
+function alert_suspicion(data){
+  console.log('akdsgcf;uagcu;gva;fi;cha;hgshere')
+  if(response === 'True'){
+    alert('News is not suspicsious');
+  }else{
+    alert('News is suspicsious');
+  }
+}
 
 $.ajax({
   type: "GET",

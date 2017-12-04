@@ -69,7 +69,7 @@ def predict():
     print(request)
     content = request.data
     print(content)
-    return "Hello"
+    return "True"
 
 
 @app.route('/index', methods=['GET', 'POST'])
